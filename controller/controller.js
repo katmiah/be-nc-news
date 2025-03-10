@@ -20,4 +20,9 @@ exports.getArticleById = (request, response, next) => {
         response.status(200).send({ article })
     }).catch(next)
 }
+exports.handlePsqlErrors = (error, request, response, next) => {
+    if(error.code === "22P02") {
+        response.status(400).send({ message: "Bad request."})
+    }
+}
 

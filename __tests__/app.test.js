@@ -66,15 +66,23 @@ describe("GET /api/articles/:article_id", () => {
       expect(typeof article_img_url).toBe("string")
     })
   })
-  
+
   test("404: Responds with error message if article ID could not be found", () => {
-    console.log("hello")
     return request(app)
     .get("/api/articles/999")
     .expect(404)
     .then(({ body }) => {
-      console.log(body)
       expect(body.message).toBe("Article ID could not be found.")
+    })
+  })
+
+  test("400: Responds with error message if article ID is invalid", () => {
+    return request(app)
+    .get("/api/articles/banana")
+    .expect(400)
+    .then(({ body }) => {
+      console.log(body)
+      expect(body.message).toBe("Bad request.")
     })
   })
 })
