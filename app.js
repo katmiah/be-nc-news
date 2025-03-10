@@ -1,11 +1,14 @@
 const express = require("express")
 const app = express()
 const { getEndpoints,
-        getTopics } = require("./controller/controller.js")
+        getTopics,
+        getArticleById } = require("./controller/controller.js")
 
 app.get("/api", getEndpoints)
 
 app.get("/api/topics", getTopics)
+
+app.get("/api/articles/:article_id", getArticleById)
 
 app.all("*", (request, response, next) => {
     response.status(404)
