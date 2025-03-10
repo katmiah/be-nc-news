@@ -1,5 +1,6 @@
 const endpointsJson = require("../endpoints.json")
-const { fetchTopics } = require("../model/model.js")
+const { fetchTopics,
+        fetchArticleById } = require("../model/model.js")
 
 exports.getEndpoints = (request, response) => {
         response.status(200).json({endpoints: endpointsJson}) 
@@ -10,5 +11,18 @@ exports.getTopics = (request, response) => {
     .then((topics) => {
         response.status(200).send({ topics })
     })
+}
+
+exports.getArticleById = (request, response, next) => {
+    const { article_id } = request.params
+    fetchArticleById(article_id)
+    .then((article) => {
+        response.status(200).send({ article })
+    }).catch(next)
+}
+exports.handlePsqlErrors = (error, request, response, next) => {
+    if(error.code === "22P02") {
+        response.status(400).send({ message: "Bad request."})
+    }
 }
 
