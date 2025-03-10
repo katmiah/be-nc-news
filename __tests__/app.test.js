@@ -39,4 +39,14 @@ describe("GET /api/topics", () => {
       })
     })
   })
+  test("404: Responds with error message when endpoint is invalid", () => {
+    return request(app)
+    .get("/api/topcs")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.message).toBe("Path not found.")
+    })
+  })
+
+  
 })
