@@ -31,14 +31,18 @@ describe("GET /api/topics", () => {
     .get("/api/topics")
     .expect(200)
     .then(({ body }) => {
+      const topics = body.topics
       expect(body.topics.length).toBe(3)
-      body.topics.forEach((topic) => {
-        const { slug, description } = topic
-        expect(typeof slug).toBe("string")
-        expect(typeof description).toBe("string")
+      topics.forEach((topic) => {
+      expect(topic).toMatchObject({
+        slug: expect.any(String),
+        description: expect.any(String)
+        })
       })
     })
   })
+})
+
   test("404: Responds with an error message when endpoint is invalid", () => {
     return request(app)
     .get("/api/topcs")
@@ -47,7 +51,7 @@ describe("GET /api/topics", () => {
       expect(body.message).toBe("Path not found.")
     })
   })
-})
+
 
 describe("GET /api/articles/:article_id", () => {
   test("200: Responds with an article object by its requested ID", () => {
@@ -55,15 +59,17 @@ describe("GET /api/articles/:article_id", () => {
     .get("/api/articles/1")
     .expect(200)
     .then(({ body }) => {
-      const { article_id, title, topic, author, body: articleBody, created_at, votes, article_img_url } = body.article;
-      expect(article_id).toBe(1)
-      expect(typeof title).toBe("string")
-      expect(typeof topic).toBe("string")
-      expect(typeof author).toBe("string")
-      expect(typeof articleBody).toBe("string")
-      expect(typeof created_at).toBe("string")
-      expect(typeof votes).toBe("number")
-      expect(typeof article_img_url).toBe("string")
+      const article = body.article;
+      expect(article).toMatchObject({
+        article_id: 1,
+        title: expect.any(String),
+        topic: expect.any(String),
+        author: expect.any(String),
+        body: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        article_img_url: expect.any(String)
+      })
     })
   })
 
@@ -94,24 +100,67 @@ describe("GET /api/articles", () => {
     .then(({ body }) => {
       expect(body.articles.length).toBe(13)
       body.articles.forEach((article) => {
-      const { article_id, title, topic, author, created_at, votes, article_img_url, comment_count } = article
-      expect(typeof article_id).toBe("number")
-      expect(typeof title).toBe("string")
-      expect(typeof topic).toBe("string")
-      expect(typeof author).toBe("string")
-      expect(typeof created_at).toBe("string")
-      expect(typeof votes).toBe("number")
-      expect(typeof article_img_url).toBe("string")
-      expect(typeof comment_count).toBe("string")
+        expect(article).toMatchObject({
+        article_id: expect.any(Number),
+        title: expect.any(String),
+        topic: expect.any(String),
+        author: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        article_img_url: expect.any(String),
+        comment_count: expect.any(String),
+        })
       })
     })
   })
+
   test("404: Responds with error message when endpoint is invalid", () => {
     return request(app)
     .get("/api/aritcles")
     .expect(404)
     .then(({ body }) => {
       expect(body.message).toBe("Path not found.")
+    })
+  })
+})
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with an array of comments for the given article ID", () => {
+    return request(app)
+    .get("/api/articles/1/comments")
+    .expect(200)
+    .then(({ body }) => {
+      console.log(body, "first log")
+      const comments = body.comments
+      console.log(comments, "second log")
+      comments.forEach((comment) => {
+      expect(comment).toMatchObject({
+        article_id: 1,
+        comment_id: expect.any(Number),
+        votes: expect.any(Number),
+        created_at: expect.any(String),
+        body: expect.any(String),
+        author: expect.any(String)
+        })
+      })
+    })
+  })
+
+  test("404: Responds with error message if article ID could not be found", () => {
+    return request(app)
+    .get("/api/articles/999/comments")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.message).toBe("Article ID could not be found.")
+    })
+  })
+
+  test("400: Responds with error message if article ID is invalid", () => {
+    return request(app)
+    .get("/api/articles/banana/comments")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.message).toBe("Bad request.")
     })
   })
 })
