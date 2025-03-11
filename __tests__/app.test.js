@@ -124,21 +124,43 @@ describe("GET /api/articles", () => {
   })
 })
 
-// describe("GET /api/articles/:article_id/comments", () => {
-//   test("200: Responds with an array of comments for the given article ID", () => {
-//     return request(app)
-//     .get("/api/articles/2/comments")
-//     .expect(200)
-//     .then(({ body }) => {
-//       const article = body.article
-//       expect(article).toMatchObject({
-//         article_id: 2,
-//         comment_id: 2,
-//         votes: expect.any(String),
-//         created_at: expect.any(String),
-//         body: expect.any(String),
-//         author: expect.any(String)
-//       })
-//     })
-//   })
-// })
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with an array of comments for the given article ID", () => {
+    return request(app)
+    .get("/api/articles/1/comments")
+    .expect(200)
+    .then(({ body }) => {
+      console.log(body, "first log")
+      const comments = body.comments
+      console.log(comments, "second log")
+      comments.forEach((comment) => {
+      expect(comment).toMatchObject({
+        article_id: 1,
+        comment_id: expect.any(Number),
+        votes: expect.any(Number),
+        created_at: expect.any(String),
+        body: expect.any(String),
+        author: expect.any(String)
+        })
+      })
+    })
+  })
+
+  test("404: Responds with error message if article ID could not be found", () => {
+    return request(app)
+    .get("/api/articles/999/comments")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.message).toBe("Article ID could not be found.")
+    })
+  })
+
+  test("400: Responds with error message if article ID is invalid", () => {
+    return request(app)
+    .get("/api/articles/banana/comments")
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.message).toBe("Bad request.")
+    })
+  })
+})
