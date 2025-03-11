@@ -4,7 +4,8 @@ const { getEndpoints,
         getTopics,
         getArticleById,
         getArticles, 
-        getCommentsById} = require("./controller/controller.js")
+        getCommentsById,
+        postCommentsById} = require("./controller/controller.js")
 
 app.get("/api", getEndpoints)
 
@@ -15,6 +16,8 @@ app.get("/api/articles/:article_id", getArticleById)
 app.get("/api/articles", getArticles)
 
 app.get("/api/articles/:article_id/comments", getCommentsById)
+
+// app.post("/api/articles/:article_id/comments", postCommentsById)
 
 app.use((error, request, response, next) => {
     if(error.status && error.message) {

@@ -130,11 +130,10 @@ describe("GET /api/articles/:article_id/comments", () => {
     .get("/api/articles/1/comments")
     .expect(200)
     .then(({ body }) => {
-      console.log(body, "first log")
+      expect(body.comments.length).toBe(11)
       const comments = body.comments
-      console.log(comments, "second log")
       comments.forEach((comment) => {
-      expect(comment).toMatchObject({
+        expect(comment).toMatchObject({
         article_id: 1,
         comment_id: expect.any(Number),
         votes: expect.any(Number),
@@ -144,6 +143,15 @@ describe("GET /api/articles/:article_id/comments", () => {
         })
       })
     })
+  })
+  test("200: Responds with an empty array if article exists but has no comments", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body)
+        expect(body.comments).toEqual([])
+      })
   })
 
   test("404: Responds with error message if article ID could not be found", () => {
@@ -164,3 +172,19 @@ describe("GET /api/articles/:article_id/comments", () => {
     })
   })
 })
+
+// describe("POST /api/articles/:article_id/comments", () => {
+//   test("201: Responds with posted comment", () => {
+//     return request(app)
+//     .post(`/api/articles/1/comments`)
+//     .send({ username: "katmiah", body: "hello!" })
+//     .expect(201)
+//     .then(({ body }) => {
+//       const comment = body.comments
+//         expect(comment).toMatchObject({
+//           username: "katmiah",
+//           body: "hello!"
+//         })
+//       })
+//     })
+//   })

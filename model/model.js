@@ -48,11 +48,20 @@ exports.fetchCommentsById = (id) => {
         ORDER BY created_at DESC`, [id])
         .then(({ rows }) => {
             if(rows.length === 0) {
-                return Promise.reject({ status: 404, message: "Article ID could not be found." })
+                return db.query(`SELECT 1 FROM articles WHERE article_id = $1`, [id])
+                .then(({ rows: articleRows }) => {
+                    if(articleRows.length === 0) {
+                        return Promise.reject({ status: 404, message: "Article ID could not be found." })
+                    }
+                    return []
+                })
             }
             return rows
         })
-}
+    }
+   
+        
+
 
 
 
