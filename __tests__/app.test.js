@@ -81,8 +81,37 @@ describe("GET /api/articles/:article_id", () => {
     .get("/api/articles/banana")
     .expect(400)
     .then(({ body }) => {
-      console.log(body)
       expect(body.message).toBe("Bad request.")
+    })
+  })
+})
+
+describe("GET /api/articles", () => {
+  test("200: Responds with an array of objects with all the properties of articles", () => {
+    return request(app)
+    .get("/api/articles")
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.articles.length).toBe(13)
+      body.articles.forEach((article) => {
+      const { article_id, title, topic, author, created_at, votes, article_img_url, comment_count } = article
+      expect(typeof article_id).toBe("number")
+      expect(typeof title).toBe("string")
+      expect(typeof topic).toBe("string")
+      expect(typeof author).toBe("string")
+      expect(typeof created_at).toBe("string")
+      expect(typeof votes).toBe("number")
+      expect(typeof article_img_url).toBe("string")
+      expect(typeof comment_count).toBe("string")
+      })
+    })
+  })
+  test("404: Responds with error message when endpoint is invalid", () => {
+    return request(app)
+    .get("/api/aritcles")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.message).toBe("Path not found.")
     })
   })
 })
