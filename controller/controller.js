@@ -2,7 +2,8 @@ const endpointsJson = require("../endpoints.json")
 const { fetchTopics,
         fetchArticleById,
         fetchArticles,
-        fetchCommentsById } = require("../model/model.js")
+        fetchCommentsById,
+        attachCommentsById } = require("../model/model.js")
 
 exports.getEndpoints = (request, response) => {
         response.status(200).json({endpoints: endpointsJson}) 
@@ -34,7 +35,18 @@ exports.getCommentsById = (request, response, next) => {
     const { article_id } = request.params
     fetchCommentsById(article_id)
     .then((comments) => {
-        response.status(200).send({comments: comments})
+        response.status(200).send({ comments: comments })
+    }).catch(next)
+}
+
+exports.postCommentByArticleId = (request, response, next) => {
+    const { article_id } = request.params
+    const { username, body } = request.body
+    console.log({article_id, username, body})
+    attachCommentsById(article_id, username, body)
+    .then((comment) => {
+        console.log(comment)
+        response.status(201).send({ comment })
     }).catch(next)
 }
 

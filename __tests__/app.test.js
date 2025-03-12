@@ -149,7 +149,6 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/2/comments")
       .expect(200)
       .then(({ body }) => {
-        console.log(body)
         expect(body.comments).toEqual([])
       })
   })
@@ -173,18 +172,24 @@ describe("GET /api/articles/:article_id/comments", () => {
   })
 })
 
-// describe("POST /api/articles/:article_id/comments", () => {
-//   test("201: Responds with posted comment", () => {
-//     return request(app)
-//     .post(`/api/articles/1/comments`)
-//     .send({ username: "katmiah", body: "hello!" })
-//     .expect(201)
-//     .then(({ body }) => {
-//       const comment = body.comments
-//         expect(comment).toMatchObject({
-//           username: "katmiah",
-//           body: "hello!"
-//         })
-//       })
-//     })
-//   })
+describe('POST /api/articles/:article_id/comments', () => {
+  test("201: Responds with posted comment with username and body properties", () => {
+    const newComment = { username: "butter_bridge", body: "Hello!" };
+
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        const comment = body.comment;
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
+          article_id: 1,
+          author: "butter_bridge",
+          body: "Hello!",
+          votes: 0,
+          created_at: expect.any(String),
+        });
+      });
+  })
+})

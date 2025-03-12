@@ -5,8 +5,10 @@ const { getEndpoints,
         getArticleById,
         getArticles, 
         getCommentsById,
-        postCommentsById} = require("./controller/controller.js")
+        postCommentByArticleId } = require("./controller/controller.js")
 
+app.use(express.json())
+         
 app.get("/api", getEndpoints)
 
 app.get("/api/topics", getTopics)
@@ -17,9 +19,10 @@ app.get("/api/articles", getArticles)
 
 app.get("/api/articles/:article_id/comments", getCommentsById)
 
-// app.post("/api/articles/:article_id/comments", postCommentsById)
+app.post("/api/articles/:article_id/comments", postCommentByArticleId)
 
 app.use((error, request, response, next) => {
+    console.error(error)
     if(error.status && error.message) {
         response.status(error.status)
         .send({ message: error.message })
