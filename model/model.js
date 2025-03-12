@@ -60,21 +60,26 @@ exports.fetchCommentsById = (id) => {
         })
     }
 
-    exports.attachCommentsById = (article_id, username, body) => {
-        if (!username || !body) {
-            return Promise.reject({
-              status: 400,
-              message: "Bad request."});
-          }
-          return db.query(`INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`,
-              [article_id, username, body],)
-              .then(({ rows }) => {
-                return rows[0];
-            });
-        }
-   
-        
+exports.attachCommentsById = (article_id, username, body) => {
+    if (!username || !body) {
+        return Promise.reject({status: 400,message: "Bad request. Missing username or body."});
+    }
+    return db.query(`SELECT * FROM users WHERE username = $1`, [username])
+        .then(({ rows }) => {
+            if (rows.length === 0) {
+                return Promise.reject({status: 404, message: "User or article could not be found."});
+                }
+            return db.query(`INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *`,[article_id, username, body]);
+            })
+            .then(({ rows }) => {
+            return rows[0]
+            })
+    }
+exports.updateArticleVotes = (article_id, inc_votes) => {
+    return db.query(`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`, [inc_votes, article_id])
+    .then(({ rows }) => {
+        return rows[0]
+    })
+} 
 
-
-
-
+    

@@ -52,7 +52,6 @@ describe("GET /api/topics", () => {
     })
   })
 
-
 describe("GET /api/articles/:article_id", () => {
   test("200: Responds with an article object by its requested ID", () => {
     return request(app)
@@ -189,7 +188,82 @@ describe('POST /api/articles/:article_id/comments', () => {
           body: "Hello!",
           votes: 0,
           created_at: expect.any(String),
-        });
-      });
+        })
+      })
+  })
+  test("404: Responds with error message if user could not be found", () => {
+    const newComment = { username: "idontexist", body: "Hello!" };
+    return request(app)
+    .post(`/api/articles/1/comments`)
+    .send(newComment)
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.message).toBe("User or article could not be found.")
+    })
+  })
+  test("404: Responds with error message if article ID does not exist", () => {
+    const newComment = { username: 'tickle122', body: 'Great article!' }
+
+    return request(app)
+    .post(`/api/articles/999/comments`)
+    .send(newComment)
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.message).toBe('User or article could not be found.')
+    })
+  })
+  test("400: Responds with error message if body or username is missing", () => {
+    const newComment = { username: "tickle122"}
+
+    return request(app)
+    .post(`/api/articles/1/comments`)
+    .send(newComment)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.message).toBe("Bad request. Missing username or body.")
+    })
+  })
+})
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Responds with updated votes property ", () => {
+    return request(app)
+    .patch(`/api/articles/1/`)
+    .send({inc_votes: 10})
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.article).toMatchObject({
+        article_id: 1,
+        votes: expect.any(Number),
+      })
+      expect(body.article.votes).toBe(110)
+    })
+  })
+  test("404: Responds with error message if article ID could not be found", () => {
+    return request(app)
+    .patch(`/api/articles/999`)
+    .send({inc_votes: 10})
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.message).toBe("Article ID could not be found.")
+    })
+  })
+  test("400: Responds wuth error message if article ID is invalid", () => {
+    return request(app)
+    .patch(`/api/articles/banana`)
+    .send({inc_votes: 10})
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.message).toBe("Invalid request.")
+    })
+  })
+  test("400: Responds with error message if votes_inc is not a number", () => {
+    return request(app)
+    .patch(`/api/articles/1`)
+    .send({inc_votes: "invalid"})
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.message).toBe("Invalid request.")
+    })
   })
 })

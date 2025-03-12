@@ -3,7 +3,8 @@ const { fetchTopics,
         fetchArticleById,
         fetchArticles,
         fetchCommentsById,
-        attachCommentsById } = require("../model/model.js")
+        attachCommentsById,
+        updateArticleVotes } = require("../model/model.js")
 
 exports.getEndpoints = (request, response) => {
         response.status(200).json({endpoints: endpointsJson}) 
@@ -42,11 +43,29 @@ exports.getCommentsById = (request, response, next) => {
 exports.postCommentByArticleId = (request, response, next) => {
     const { article_id } = request.params
     const { username, body } = request.body
-    console.log({article_id, username, body})
     attachCommentsById(article_id, username, body)
     .then((comment) => {
-        console.log(comment)
         response.status(201).send({ comment })
+    }).catch(next)
+}
+
+exports.patchCommentVotes = (request, response, next) => {
+    const { article_id } = request.params
+    const { inc_votes } = request.body
+
+    if(isNaN(article_id)) {
+        return response.status(400).json({ message: "Invalid request."})
+    }
+
+    if(typeof inc_votes !== "number") {
+        return response.status(400).json({ message: "Invalid request."})
+    }
+    updateArticleVotes(article_id, inc_votes)
+    .then((updatedArticle) => {
+        if(!updatedArticle) {
+            return response.status(404).json({ message: "Article ID could not be found."})
+        }
+        response.status(200).json({ article: updatedArticle })
     }).catch(next)
 }
 
