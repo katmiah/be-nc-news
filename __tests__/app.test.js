@@ -267,3 +267,32 @@ describe("PATCH /api/articles/:article_id", () => {
     })
   })
 })
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: Deletes given comment by comment ID", () => {
+    return request(app)
+    .delete(`/api/comments/3`)
+    .expect(204)
+    .then(() => {
+      return db.query(`SELECT * FROM comments WHERE comment_id = 3`)
+    })
+    .then(({ rows }) => {
+      expect(rows.length).toBe(0)
+    })
+  })
+  test("404: Responds with error message if comment ID does not exist", () => {
+    return request(app)
+    .delete(`/api/comments/9999`)
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.message).toBe("Comment ID could not be found.")
+    })
+  })
+  test("400: Responds with error message if comment ID is invalid", () => {
+    return request(app)
+    .delete(`/api/comments/banana`)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.message).toBe("Bad request.")
+    })
+  })
+})

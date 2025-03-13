@@ -6,7 +6,8 @@ const { getEndpoints,
         getArticles, 
         getCommentsById,
         postCommentByArticleId,
-        patchCommentVotes } = require("./controller/controller.js")
+        patchCommentVotes,
+        deleteComment } = require("./controller/controller.js")
 
 app.use(express.json())
          
@@ -23,6 +24,8 @@ app.get("/api/articles/:article_id/comments", getCommentsById)
 app.post("/api/articles/:article_id/comments", postCommentByArticleId)
 
 app.patch("/api/articles/:article_id", patchCommentVotes)
+
+app.delete("/api/comments/:comment_id", deleteComment)
 
 app.use((error, request, response, next) => {
     if(error.status && error.message) {
