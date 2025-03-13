@@ -8,9 +8,6 @@ exports.fetchTopics = () => {
 }
 
 exports.fetchArticleById = (id) => {
-    if(isNaN(id)) {
-        return Promise.reject({ status: 400, message: "Bad request."})
-    }
     return db.query(`SELECT * FROM articles WHERE article_id = $1`, [id])
     .then(({ rows }) => {
         if(rows.length == 0) {
@@ -39,9 +36,6 @@ exports.fetchArticles = () => {
 }
 
 exports.fetchCommentsById = (id) => {
-    if(isNaN(id)) {
-        return Promise.reject({ status: 400, message: "Bad request."})
-    }
     return db.query(`SELECT comment_id, votes, created_at, author, body, article_id
         FROM comments
         WHERE article_id = $1
@@ -83,15 +77,19 @@ exports.updateArticleVotes = (article_id, inc_votes) => {
 } 
 
 exports.removeComment = (comment_id) => {
-    if(isNaN(comment_id)) {
-        return Promise.reject({ status: 400, message: "Bad request."})
-    }
     return db.query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *`, [comment_id])
     .then(({ rows }) => {
         if(rows.length === 0) {
             return Promise.reject({ status: 404, message: "Comment ID could not be found."})
         }
         return
+    })
+}
+
+exports.fetchUsers = () => {
+    return db.query(`SELECT * FROM users`)
+    .then(({ rows }) => {
+        return rows
     })
 }
     

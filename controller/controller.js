@@ -5,10 +5,11 @@ const { fetchTopics,
         fetchCommentsById,
         attachCommentsById,
         updateArticleVotes,
-        removeComment } = require("../model/model.js")
+        removeComment,
+        fetchUsers } = require("../model/model.js")
 
 exports.getEndpoints = (request, response) => {
-        response.status(200).json({endpoints: endpointsJson}) 
+        response.status(200).send({endpoints: endpointsJson}) 
 }
 
 exports.getTopics = (request, response, next) => {
@@ -54,19 +55,15 @@ exports.patchCommentVotes = (request, response, next) => {
     const { article_id } = request.params
     const { inc_votes } = request.body
 
-    if(isNaN(article_id)) {
-        return response.status(400).json({ message: "Invalid request."})
-    }
-
     if(typeof inc_votes !== "number") {
-        return response.status(400).json({ message: "Invalid request."})
+        return response.status(400).send({ message: "Invalid request."})
     }
     updateArticleVotes(article_id, inc_votes)
     .then((updatedArticle) => {
         if(!updatedArticle) {
-            return response.status(404).json({ message: "Article ID could not be found."})
+            return response.status(404).send({ message: "Article ID could not be found."})
         }
-        response.status(200).json({ article: updatedArticle })
+        response.status(200).send({ article: updatedArticle })
     }).catch(next)
 }
 
@@ -78,11 +75,19 @@ exports.deleteComment = (request, response, next) => {
     }).catch(next)
 }
 
+exports.getUsers = (request, response, next) => {
+    fetchUsers()
+    .then((users) => {
+        response.status(200).send({ users })
+    }).catch(next)
+}
+
 exports.handlePsqlErrors = (error, request, response, next) => {
+    console.error(error)
     if (error.status) {
         response.status(error.status).send({ message: error.message })
-    } else if (error.code === "22P02") {
-        response.status(400).send({ message: "Bad request."})
+    } else if (error.code === "22P02" ) {
+        response.status(400).send({ message: "Invalid request."})
     } else {
         response.status(500).send({ message: "Internal Server Error" })
     }

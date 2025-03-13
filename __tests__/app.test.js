@@ -86,7 +86,7 @@ describe("GET /api/articles/:article_id", () => {
     .get("/api/articles/banana")
     .expect(400)
     .then(({ body }) => {
-      expect(body.message).toBe("Bad request.")
+      expect(body.message).toBe("Invalid request.")
     })
   })
 })
@@ -166,7 +166,7 @@ describe("GET /api/articles/:article_id/comments", () => {
     .get("/api/articles/banana/comments")
     .expect(400)
     .then(({ body }) => {
-      expect(body.message).toBe("Bad request.")
+      expect(body.message).toBe("Invalid request.")
     })
   })
 })
@@ -234,9 +234,8 @@ describe("PATCH /api/articles/:article_id", () => {
     .then(({ body }) => {
       expect(body.article).toMatchObject({
         article_id: 1,
-        votes: expect.any(Number),
+        votes: 110,
       })
-      expect(body.article.votes).toBe(110)
     })
   })
   test("404: Responds with error message if article ID could not be found", () => {
@@ -267,6 +266,7 @@ describe("PATCH /api/articles/:article_id", () => {
     })
   })
 })
+
 describe("DELETE /api/comments/:comment_id", () => {
   test("204: Deletes given comment by comment ID", () => {
     return request(app)
@@ -292,7 +292,34 @@ describe("DELETE /api/comments/:comment_id", () => {
     .delete(`/api/comments/banana`)
     .expect(400)
     .then(({ body }) => {
-      expect(body.message).toBe("Bad request.")
+      expect(body.message).toBe("Invalid request.")
+    })
+  })
+})
+
+describe("GET /api/users", () => {
+  test("200: Responds with an array of objects with user properties", () => {
+    return request(app)
+    .get(`/api/users`)
+    .expect(200)
+    .then(({ body }) => {
+      const users = body.users
+      expect(body.users.length).toBe(4)
+      users.forEach((user) => {
+        expect(user).toMatchObject({
+          username: expect.any(String),
+          name: expect.any(String),
+          avatar_url: expect.any(String)
+        })
+      })
+    })
+  })
+  test("404: Responds with error message if endpoint is invalid", () => {
+    return request(app)
+    .get(`/api/uers`)
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.message).toBe("Path not found.")
     })
   })
 })
