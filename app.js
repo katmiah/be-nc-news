@@ -1,5 +1,6 @@
 const express = require("express")
 const app = express()
+const { handlePsqlErrors } = require("./controller/controller.js")
 const { getEndpoints,
         getTopics,
         getArticleById,
@@ -7,7 +8,8 @@ const { getEndpoints,
         getCommentsById,
         postCommentByArticleId,
         patchCommentVotes,
-        deleteComment } = require("./controller/controller.js")
+        deleteComment,
+        getUsers } = require("./controller/controller.js")
 
 app.use(express.json())
          
@@ -26,6 +28,10 @@ app.post("/api/articles/:article_id/comments", postCommentByArticleId)
 app.patch("/api/articles/:article_id", patchCommentVotes)
 
 app.delete("/api/comments/:comment_id", deleteComment)
+
+app.get("/api/users", getUsers)
+
+app.use(handlePsqlErrors)
 
 app.use((error, request, response, next) => {
     if(error.status && error.message) {
