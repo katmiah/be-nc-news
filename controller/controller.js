@@ -4,7 +4,8 @@ const { fetchTopics,
         fetchArticles,
         fetchCommentsById,
         attachCommentsById,
-        updateArticleVotes } = require("../model/model.js")
+        updateArticleVotes,
+        removeComment } = require("../model/model.js")
 
 exports.getEndpoints = (request, response) => {
         response.status(200).json({endpoints: endpointsJson}) 
@@ -66,6 +67,14 @@ exports.patchCommentVotes = (request, response, next) => {
             return response.status(404).json({ message: "Article ID could not be found."})
         }
         response.status(200).json({ article: updatedArticle })
+    }).catch(next)
+}
+
+exports.deleteComment = (request, response, next) => {
+    const { comment_id } = request.params
+    removeComment(comment_id)
+    .then(() => {
+        response.status(204).send()
     }).catch(next)
 }
 
