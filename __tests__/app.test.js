@@ -5,6 +5,7 @@ const app = require("../app.js")
 const data = require("../db/data/test-data")
 const db = require("../db/connection.js")
 const seed = require("../db/seeds/seed.js")
+const sorted = require("jest-sorted")
 
 /* Set up your beforeEach & afterAll functions here */
 beforeEach(()=>{
@@ -113,6 +114,45 @@ describe("GET /api/articles", () => {
     })
   })
 
+describe("Sort by queries", () => {
+  test("200: Responds with created_at in ascending order", () => {
+    return request(app)
+    .get(`/api/articles?order=asc`)
+    .expect(200)
+    .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", { descending: false})
+    })
+  })
+
+test("200: Responds with created_at in descending order", () => {
+  return request(app)
+  .get(`/api/articles?order=desc`)
+  .expect(200)
+  .then(({ body }) => {
+      expect(body.articles).toBeSortedBy("created_at", { descending: true})
+    })
+  })
+
+test("200: Responds with created_at in default order (descending)", () => {
+  return request(app)
+  .get(`/api/articles`)
+  .expect(200)
+  .then(({ body }) => {
+      expect(body.articles.length).toBe(13)
+      expect(body.articles).toBeSortedBy("created_at", { descending: true})
+    })
+  })
+
+test("400: Responds with error message for invalid order query", () => {
+  return request(app)
+    .get(`/api/articles?order=orderbyinvalid`)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.message).toBe("Invalid order query")
+    })
+  })
+})
+
   test("404: Responds with error message when endpoint is invalid", () => {
     return request(app)
     .get("/api/aritcles")
@@ -122,6 +162,7 @@ describe("GET /api/articles", () => {
     })
   })
 })
+
 
 describe("GET /api/articles/:article_id/comments", () => {
   test("200: Responds with an array of comments for the given article ID", () => {
@@ -143,6 +184,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       })
     })
   })
+
   test("200: Responds with an empty array if article exists but has no comments", () => {
     return request(app)
       .get("/api/articles/2/comments")

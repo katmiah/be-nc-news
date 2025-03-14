@@ -28,7 +28,14 @@ exports.getArticleById = (request, response, next) => {
 }
 
 exports.getArticles = (request, response, next) => {
-    fetchArticles()
+    const { order } = request.query
+    const validOrders = ['asc', 'desc']
+
+    if (order && !validOrders.includes(order)) {
+      return response.status(400).send({ message: 'Invalid order query' });
+    }
+    
+    fetchArticles(order)
     .then((articles) => {
         response.status(200).send({ articles })
     }).catch(next)
@@ -82,8 +89,8 @@ exports.getUsers = (request, response, next) => {
     }).catch(next)
 }
 
+
 exports.handlePsqlErrors = (error, request, response, next) => {
-    console.error(error)
     if (error.status) {
         response.status(error.status).send({ message: error.message })
     } else if (error.code === "22P02" ) {

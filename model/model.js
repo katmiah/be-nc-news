@@ -17,7 +17,10 @@ exports.fetchArticleById = (id) => {
     })
 }
 
-exports.fetchArticles = () => {
+exports.fetchArticles = (order = "desc") => {
+    const validOrders = ["asc", "desc"]
+    const finalOrder = validOrders.includes(order?.toLowerCase()) ? order.toLowerCase() : "desc" 
+
     return db.query(`SELECT articles.article_id, 
         articles.title, 
         articles.topic, 
@@ -29,7 +32,7 @@ exports.fetchArticles = () => {
         FROM articles
         LEFT JOIN comments ON articles.article_id = comments.article_id
         GROUP BY articles.article_id
-        ORDER BY articles.created_at DESC;`)
+        ORDER BY articles.created_at ${finalOrder.toUpperCase()}`)
         .then(({ rows }) => {
             return rows
         })
@@ -92,4 +95,5 @@ exports.fetchUsers = () => {
         return rows
     })
 }
+
     
