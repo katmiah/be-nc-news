@@ -113,6 +113,14 @@ describe("GET /api/articles", () => {
       })
     })
   })
+  test("404: Responds with error message when endpoint is invalid", () => {
+    return request(app)
+    .get("/api/aritcles")
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.message).toBe("Path not found.")
+      })
+    })
 
 describe("Sort by queries", () => {
   test("200: Responds with created_at in ascending order", () => {
@@ -120,7 +128,7 @@ describe("Sort by queries", () => {
     .get(`/api/articles?order=asc`)
     .expect(200)
     .then(({ body }) => {
-        expect(body.articles).toBeSortedBy("created_at", { descending: false})
+        expect(body.articles).toBeSortedBy("created_at", { ascending: true})
     })
   })
 
@@ -153,15 +161,30 @@ test("400: Responds with error message for invalid order query", () => {
   })
 })
 
-  test("404: Responds with error message when endpoint is invalid", () => {
+describe("Filter queries", () => {
+  test("200: Responds with filtered articles", () => {
     return request(app)
-    .get("/api/aritcles")
+    .get(`/api/articles?topic=mitch`)
+    .expect(200)
+    .then(({body})=>{
+      const articles = body.articles
+      expect(articles.length).toBe(12)
+      articles.forEach((article) => {
+        expect(article.topic).toBe("mitch")
+        })
+      })
+    })
+  test("404: Responds with error message if no articles by that name", () => {
+    return request(app)
+    .get(`/api/articles?topic=invalid`)
     .expect(404)
     .then(({ body }) => {
-      expect(body.message).toBe("Path not found.")
+      expect(body.message).toBe("No articles found.")
+      })
     })
   })
 })
+
 
 
 describe("GET /api/articles/:article_id/comments", () => {
