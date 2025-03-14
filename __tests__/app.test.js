@@ -70,8 +70,12 @@ describe("GET /api/articles/:article_id", () => {
         votes: expect.any(Number),
         article_img_url: expect.any(String)
       })
+      const commentCount = parseInt(article.article_id, 10);
+      expect(commentCount).toBeGreaterThanOrEqual(0);
+      expect(Number.isInteger(commentCount)).toBe(true)
     })
   })
+
 
   test("404: Responds with error message if article ID could not be found", () => {
     return request(app)
@@ -113,6 +117,7 @@ describe("GET /api/articles", () => {
       })
     })
   })
+  
   test("404: Responds with error message when endpoint is invalid", () => {
     return request(app)
     .get("/api/aritcles")
@@ -128,7 +133,7 @@ describe("Sort by queries", () => {
     .get(`/api/articles?order=asc`)
     .expect(200)
     .then(({ body }) => {
-        expect(body.articles).toBeSortedBy("created_at", { ascending: true})
+        expect(body.articles).toBeSorted("created_at", { ascending: true})
     })
   })
 
@@ -137,7 +142,7 @@ test("200: Responds with created_at in descending order", () => {
   .get(`/api/articles?order=desc`)
   .expect(200)
   .then(({ body }) => {
-      expect(body.articles).toBeSortedBy("created_at", { descending: true})
+      expect(body.articles).toBeSorted("created_at", { descending: true})
     })
   })
 
@@ -147,7 +152,7 @@ test("200: Responds with created_at in default order (descending)", () => {
   .expect(200)
   .then(({ body }) => {
       expect(body.articles.length).toBe(13)
-      expect(body.articles).toBeSortedBy("created_at", { descending: true})
+      expect(body.articles).toBeSorted("created_at", { descending: true})
     })
   })
 
@@ -174,6 +179,7 @@ describe("Filter queries", () => {
         })
       })
     })
+
   test("404: Responds with error message if no articles by that name", () => {
     return request(app)
     .get(`/api/articles?topic=invalid`)
@@ -184,8 +190,6 @@ describe("Filter queries", () => {
     })
   })
 })
-
-
 
 describe("GET /api/articles/:article_id/comments", () => {
   test("200: Responds with an array of comments for the given article ID", () => {
@@ -256,6 +260,7 @@ describe('POST /api/articles/:article_id/comments', () => {
         })
       })
   })
+
   test("404: Responds with error message if user could not be found", () => {
     const newComment = { username: "idontexist", body: "Hello!" };
     return request(app)
@@ -266,6 +271,7 @@ describe('POST /api/articles/:article_id/comments', () => {
       expect(body.message).toBe("User or article could not be found.")
     })
   })
+
   test("404: Responds with error message if article ID does not exist", () => {
     const newComment = { username: 'tickle122', body: 'Great article!' }
 
@@ -277,6 +283,7 @@ describe('POST /api/articles/:article_id/comments', () => {
       expect(body.message).toBe('User or article could not be found.')
     })
   })
+
   test("400: Responds with error message if body or username is missing", () => {
     const newComment = { username: "tickle122"}
 
@@ -303,6 +310,7 @@ describe("PATCH /api/articles/:article_id", () => {
       })
     })
   })
+
   test("404: Responds with error message if article ID could not be found", () => {
     return request(app)
     .patch(`/api/articles/999`)
@@ -312,6 +320,7 @@ describe("PATCH /api/articles/:article_id", () => {
       expect(body.message).toBe("Article ID could not be found.")
     })
   })
+
   test("400: Responds wuth error message if article ID is invalid", () => {
     return request(app)
     .patch(`/api/articles/banana`)
@@ -321,6 +330,7 @@ describe("PATCH /api/articles/:article_id", () => {
       expect(body.message).toBe("Invalid request.")
     })
   })
+
   test("400: Responds with error message if votes_inc is not a number", () => {
     return request(app)
     .patch(`/api/articles/1`)
@@ -344,6 +354,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       expect(rows.length).toBe(0)
     })
   })
+
   test("404: Responds with error message if comment ID does not exist", () => {
     return request(app)
     .delete(`/api/comments/9999`)
@@ -352,6 +363,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       expect(body.message).toBe("Comment ID could not be found.")
     })
   })
+
   test("400: Responds with error message if comment ID is invalid", () => {
     return request(app)
     .delete(`/api/comments/banana`)
@@ -379,6 +391,7 @@ describe("GET /api/users", () => {
       })
     })
   })
+
   test("404: Responds with error message if endpoint is invalid", () => {
     return request(app)
     .get(`/api/uers`)

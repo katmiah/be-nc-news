@@ -7,7 +7,7 @@ const { fetchTopics,
         updateArticleVotes,
         removeComment,
         fetchUsers, 
-        fetchArticleTopic} = require("../model/model.js")
+        fetchArticleTopic } = require("../model/model.js")
 
 exports.getEndpoints = (request, response) => {
         response.status(200).send({endpoints: endpointsJson}) 
@@ -25,8 +25,8 @@ exports.getArticleById = (request, response, next) => {
     fetchArticleById(article_id)
     .then((article) => {
         response.status(200).send({ article })
-    }).catch(next)
-}
+        }).catch(next)
+    }
 
 exports.getArticles = (request, response, next) => {
     const { order, topic } = request.query
