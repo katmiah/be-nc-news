@@ -133,7 +133,7 @@ describe("Sort by queries", () => {
     .get(`/api/articles?order=asc`)
     .expect(200)
     .then(({ body }) => {
-        expect(body.articles).toBeSorted("created_at", { ascending: true})
+        expect(body.articles).toBeSorted("created_at", { descending: false})
     })
   })
 
