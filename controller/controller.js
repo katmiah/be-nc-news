@@ -6,7 +6,8 @@ const { fetchTopics,
         attachCommentsById,
         updateArticleVotes,
         removeComment,
-        fetchUsers } = require("../model/model.js")
+        fetchUsers, 
+        fetchArticleTopic} = require("../model/model.js")
 
 exports.getEndpoints = (request, response) => {
         response.status(200).send({endpoints: endpointsJson}) 
@@ -28,18 +29,27 @@ exports.getArticleById = (request, response, next) => {
 }
 
 exports.getArticles = (request, response, next) => {
-    const { order } = request.query
+    const { order, topic } = request.query
     const validOrders = ['asc', 'desc']
 
     if (order && !validOrders.includes(order)) {
-      return response.status(400).send({ message: 'Invalid order query' });
+      return response.status(400).send({ message: 'Invalid order query' })
+      
     }
-    
-    fetchArticles(order)
-    .then((articles) => {
-        response.status(200).send({ articles })
-    }).catch(next)
+    if (topic) {
+        fetchArticleTopic(topic)
+        .then((articles) => {
+            response.status(200).send({ articles })
+        }).catch(next)
+
+    } else {
+        fetchArticles(order)
+        .then((articles) => {
+            response.status(200).send({ articles })
+        }).catch(next)
+    }
 }
+   
 
 exports.getCommentsById = (request, response, next) => {
     const { article_id } = request.params

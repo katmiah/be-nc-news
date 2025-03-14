@@ -115,5 +115,28 @@
       "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
     }
   }
+},
+"GET /api/articles?order=desc": {
+  "description": "serves an array of articles sorted by created_at date",
+  "queries": ["created_at"],
+  "exampleResponse": {
+    "articles": {
+      "article_id": 7,
+      "title": "Z",
+      "topic": "mitch",
+      "author": "icellusedkars",
+      "created_at": "2020-01-07T14:08:00.000Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+       "comment_count": "0"
+    }
+  }
+},
+"GET /api/articles?topic=mitch": {
+  "description": "serves an array of filtered topics",
+  "queries": ["topic"],
+  "exampleResponse": {
+    "topic": "mitch"
+  }
 }
 }

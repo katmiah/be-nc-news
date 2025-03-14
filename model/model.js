@@ -33,9 +33,21 @@ exports.fetchArticles = (order = "desc") => {
         LEFT JOIN comments ON articles.article_id = comments.article_id
         GROUP BY articles.article_id
         ORDER BY articles.created_at ${finalOrder.toUpperCase()}`)
+        
         .then(({ rows }) => {
             return rows
         })
+}
+
+exports.fetchArticleTopic = (topic) => {
+    return db.query(`SELECT topic FROM articles WHERE topic = $1`, [topic])
+    .then(({ rows }) => {
+        if(rows.length === 0 ) {
+            return Promise.reject({ status: 404,  message: "No articles found."})
+        }
+        return rows
+        
+    })
 }
 
 exports.fetchCommentsById = (id) => {
