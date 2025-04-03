@@ -1,32 +1,42 @@
-const db = require('../db/connection.js')
+const db = require("../db/connection.js");
 
 exports.fetchTopics = () => {
-    return db.query(`SELECT * FROM topics`)
-    .then(({ rows }) => {
-        return rows
-    })
-}
+  return db.query(`SELECT * FROM topics`).then(({ rows }) => {
+    return rows;
+  });
+};
 
 exports.fetchArticleById = (article_id) => {
-    return db.query(`
+  return db
+    .query(
+      `
         SELECT articles.*, COUNT(comments.article_id) AS comment_count 
         FROM articles
         LEFT JOIN comments ON comments.article_id = articles.article_id
         WHERE articles.article_id = $1
-        GROUP BY articles.article_id`, [article_id])
-        .then(({ rows }) => {
-            if(rows.length == 0) {
-                return Promise.reject({ status: 404, message: "Article ID could not be found."})
-            }
-            return rows[0]
-        })
-    }
+        GROUP BY articles.article_id`,
+      [article_id]
+    )
+    .then(({ rows }) => {
+      if (rows.length == 0) {
+        return Promise.reject({
+          status: 404,
+          message: "Article ID could not be found.",
+        });
+      }
+      return rows[0];
+    });
+};
 
 exports.fetchArticles = (order = "desc") => {
-    const validOrders = ["asc", "desc"]
-    const finalOrder = validOrders.includes(order?.toLowerCase()) ? order.toLowerCase() : "desc" 
+  const validOrders = ["asc", "desc"];
+  const finalOrder = validOrders.includes(order?.toLowerCase())
+    ? order.toLowerCase()
+    : "desc";
 
-    return db.query(`SELECT articles.article_id, 
+  return db
+    .query(
+      `SELECT articles.article_id, 
         articles.title, 
         articles.topic, 
         articles.author, 
@@ -37,93 +47,125 @@ exports.fetchArticles = (order = "desc") => {
         FROM articles
         LEFT JOIN comments ON articles.article_id = comments.article_id
         GROUP BY articles.article_id
-        ORDER BY articles.created_at ${finalOrder.toUpperCase()}`)
-        
-        .then(({ rows }) => {
-            return rows
-        })
-}
+        ORDER BY articles.created_at ${finalOrder.toUpperCase()}`
+    )
+
+    .then(({ rows }) => {
+      return rows;
+    });
+};
 
 exports.fetchArticleTopic = (topic) => {
-    return db.query(`SELECT topic FROM articles WHERE topic = $1`, [topic])
+  return db
+    .query(
+      `SELECT article_id, title, topic, author, created_at FROM articles WHERE topic = $1`,
+      [topic]
+    )
     .then(({ rows }) => {
-        if(rows.length === 0 ) {
-            return Promise.reject({ status: 404,  message: "No articles found."})
-        }
-        return rows
-        
-    })
-}
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, message: "No articles found." });
+      }
+      return rows;
+    });
+};
 
 exports.fetchCommentsById = (id) => {
-    return db.query(`SELECT comment_id, votes, created_at, author, body, article_id
+  return db
+    .query(
+      `SELECT comment_id, votes, created_at, author, body, article_id
         FROM comments
         WHERE article_id = $1
-        ORDER BY created_at DESC`, [id])
-        .then(({ rows }) => {
-            if(rows.length === 0) {
-                return db.query(`SELECT 1 FROM articles WHERE article_id = $1`, [id])
-                .then(({ rows: articleRows }) => {
-                    if(articleRows.length === 0) {
-                        return Promise.reject({ status: 404, message: "Article ID could not be found." })
-                    }
-                    return []
-                })
+        ORDER BY created_at DESC`,
+      [id]
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return db
+          .query(`SELECT 1 FROM articles WHERE article_id = $1`, [id])
+          .then(({ rows: articleRows }) => {
+            if (articleRows.length === 0) {
+              return Promise.reject({
+                status: 404,
+                message: "Article ID could not be found.",
+              });
             }
-            return rows
-        })
-    }
+            return [];
+          });
+      }
+      return rows;
+    });
+};
 
 exports.fetchCommentCount = () => {
-    return db.query(`SELECT articles.*,
+  return db
+    .query(
+      `SELECT articles.*,
         COUNT(comments.comment_id) 
         AS comment_count 
         FROM articles LEFT JOIN comments 
         ON articles.article_id = comments.article_id
-        GROUP BY articles.article_id`)
-        .then(({ rows }) => {
-            console.log(rows)
-            return rows
-        })
-}
+        GROUP BY articles.article_id`
+    )
+    .then(({ rows }) => {
+      console.log(rows);
+      return rows;
+    });
+};
 
 exports.attachCommentsById = (article_id, username, body) => {
-    if (!username || !body) {
-        return Promise.reject({status: 400,message: "Bad request. Missing username or body."});
-    }
-    return db.query(`SELECT * FROM users WHERE username = $1`, [username])
-        .then(({ rows }) => {
-            if (rows.length === 0) {
-                return Promise.reject({status: 404, message: "User or article could not be found."});
-                }
-            return db.query(`INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *`,[article_id, username, body]);
-            })
-            .then(({ rows }) => {
-            return rows[0]
-            })
-    }
-exports.updateArticleVotes = (article_id, inc_votes) => {
-    return db.query(`UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`, [inc_votes, article_id])
+  if (!username || !body) {
+    return Promise.reject({
+      status: 400,
+      message: "Bad request. Missing username or body.",
+    });
+  }
+  return db
+    .query(`SELECT * FROM users WHERE username = $1`, [username])
     .then(({ rows }) => {
-        return rows[0]
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          message: "User or article could not be found.",
+        });
+      }
+      return db.query(
+        `INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *`,
+        [article_id, username, body]
+      );
     })
-} 
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
+exports.updateArticleVotes = (article_id, inc_votes) => {
+  return db
+    .query(
+      `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`,
+      [inc_votes, article_id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
 
 exports.removeComment = (comment_id) => {
-    return db.query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *`, [comment_id])
+  return db
+    .query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *`, [
+      comment_id,
+    ])
     .then(({ rows }) => {
-        if(rows.length === 0) {
-            return Promise.reject({ status: 404, message: "Comment ID could not be found."})
-        }
-        return
-    })
-}
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          message: "Comment ID could not be found.",
+        });
+      }
+      return;
+    });
+};
 
 exports.fetchUsers = () => {
-    return db.query(`SELECT * FROM users`)
-    .then(({ rows }) => {
-        return rows
-    })
-}
-
-    
+  return db.query(`SELECT * FROM users`).then(({ rows }) => {
+    return rows;
+  });
+};

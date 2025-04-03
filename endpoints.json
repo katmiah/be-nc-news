@@ -30,25 +30,30 @@
     "description": "serves an array of articles by its id",
     "queries": ["author", "topic", "sort_by", "order"],
     "exampleResponse": {
-      "articles": 
-        {
-          "article_id": 1,
-          "title": "Living in the shadow of a great man",
-          "topic": "mitch",
-          "author": "butter_bridge",
-          "body": "I find this existence challenging",
-          "created_at": "1594329060000",
-          "votes": 100,
-          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-        }
+      "articles": {
+        "article_id": 1,
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": "1594329060000",
+        "votes": 100,
+        "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+      }
     }
   },
   "GET /api/articles/:article_id/comments": {
     "description": "serves an array of comments for the given article id",
-    "queries": ["comment_id", "votes", "created_at", "author", "body", "article_id"],
+    "queries": [
+      "comment_id",
+      "votes",
+      "created_at",
+      "author",
+      "body",
+      "article_id"
+    ],
     "exampleResponse": {
-      "comments":
-      {
+      "comments": {
         "comment_id": 1,
         "article_id": 18,
         "body": "Itaque quisquam est similique et est perspiciatis reprehenderit voluptatem autem. Voluptatem accusantium eius error adipisci quibusdam doloribus.",
@@ -59,84 +64,93 @@
   },
   "POST /api/articles/:article_id/comments": {
     "description": "serves an object with username and body properties",
-    "queries": ["comment_id", "article_id", "author", "body", "votes", "created_at"],
+    "queries": [
+      "comment_id",
+      "article_id",
+      "author",
+      "body",
+      "votes",
+      "created_at"
+    ],
     "exampleResponse": {
-    "comments":
-    { 
-      "comment_id": 19,
-      "article_id": 1,
-      "author": "butter_bridge",
-      "body": "Hello!",
-      "votes": 0,
-      "created_at": "2025-03-12T13:30:02.255Z"
+      "comments": {
+        "comment_id": 19,
+        "article_id": 1,
+        "author": "butter_bridge",
+        "body": "Hello!",
+        "votes": 0,
+        "created_at": "2025-03-12T13:30:02.255Z"
+      }
     }
-  } 
-},
-"PATCH /api/articles/:article_id": {
-  "description": "serves an object with updated votes property",
-  "queries": ["inc_votes"],
-  "exampleResponse": {
-    "articles":
-    {
-      "article_id": 1,
-      "title": "Living in the shadow of a great man",
-      "topic": "mitch",
-      "author": "butter_bridge",
-      "body": "I find this existence challenging",
-      "created_at": "2020-07-09T20:11:00.000Z",
-      "votes": 110,
-      "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "serves an object with updated votes property",
+    "queries": ["inc_votes"],
+    "exampleResponse": {
+      "articles": {
+        "article_id": 1,
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": "2020-07-09T20:11:00.000Z",
+        "votes": 110,
+        "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+      }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes comment given by comment id",
+    "queries": ["comment_id"],
+    "exampleResponse": {
+      "comments": {
+        "comment_id": 3,
+        "article_id": 1,
+        "author": "cellusedkars",
+        "body": "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works.",
+        "votes": 100,
+        "created_at": "2020-03-01T01:13:00.000Z"
+      }
+    }
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": ["username", "name", "avatar_url"],
+    "exampleResponse": {
+      "users": {
+        "username": "butter_bridge",
+        "name": "jonny",
+        "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+      }
+    }
+  },
+  "GET /api/articles?order=desc": {
+    "description": "serves an array of articles sorted by created_at date",
+    "queries": ["created_at"],
+    "exampleResponse": {
+      "articles": {
+        "article_id": 7,
+        "title": "Z",
+        "topic": "mitch",
+        "author": "icellusedkars",
+        "created_at": "2020-01-07T14:08:00.000Z",
+        "votes": 0,
+        "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        "comment_count": "0"
+      }
+    }
+  },
+  "GET /api/articles?topic=mitch": {
+    "description": "serves an array of filtered topics",
+    "queries": ["topic"],
+    "exampleResponse": {
+      "topic": {
+        "article_id": 13,
+        "title": "Another article about Mitch",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "created_at": "2020-10-11T11:24:00.000Z"
+      }
     }
   }
-},
-"DELETE /api/comments/:comment_id": {
-  "description": "deletes comment given by comment id",
-  "queries": ["comment_id"],
-  "exampleResponse": {
-    "comments":
-    {
-      "comment_id": 3,
-      "article_id": 1,
-      "author": "cellusedkars",
-      "body": "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works.",
-      "votes": 100,
-      "created_at": "2020-03-01T01:13:00.000Z"
-    }
-  } 
-},
-"GET /api/users": {
-  "description":"serves an array of all users",
-  "queries": ["username", "name", "avatar_url"],
-  "exampleResponse": {
-    "users":
-    {
-      "username": "butter_bridge",
-      "name": "jonny",
-      "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
-    }
-  }
-},
-"GET /api/articles?order=desc": {
-  "description": "serves an array of articles sorted by created_at date",
-  "queries": ["created_at"],
-  "exampleResponse": {
-    "articles": {
-      "article_id": 7,
-      "title": "Z",
-      "topic": "mitch",
-      "author": "icellusedkars",
-      "created_at": "2020-01-07T14:08:00.000Z",
-      "votes": 0,
-      "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-       "comment_count": "0"
-    }
-  }
-},
-"GET /api/articles?topic=mitch": {
-  "description": "serves an array of filtered topics",
-  "queries": ["topic"],
-  "exampleResponse": {
-    "topic": "mitch"
-  }
-}
 }
