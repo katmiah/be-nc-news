@@ -28,19 +28,12 @@ exports.fetchArticleById = (article_id) => {
     });
 };
 
-exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
-  const validSorts = ["created_at", "votes", "comment_count"];
+exports.fetchArticles = (order = "desc") => {
   const validOrders = ["asc", "desc"];
 
-  const finalSort = validSorts.includes(sort_by) ? sort_by : "created_at";
   const finalOrder = validOrders.includes(order?.toLowerCase())
     ? order.toLowerCase()
     : "desc";
-
-  const sortColumn =
-    finalSort === "comment_count"
-      ? "COUNT(comments.comment_id)"
-      : `articles.${finalSort}`;
 
   return db
     .query(
@@ -55,7 +48,7 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
         FROM articles
         LEFT JOIN comments ON articles.article_id = comments.article_id
         GROUP BY articles.article_id
-        ORDER BY ${sortColumn} ${finalOrder.toUpperCase()}`
+        ORDER BY articles.created_at ${finalOrder.toUpperCase()}`
     )
 
     .then(({ rows }) => {
