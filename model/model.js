@@ -37,6 +37,11 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
     ? order.toLowerCase()
     : "desc";
 
+  const sortColumn =
+    finalSort === "comment_count"
+      ? "COUNT(comments.comment_id)"
+      : `articles.${finalSort}`;
+
   return db
     .query(
       `SELECT articles.article_id, 
@@ -50,7 +55,7 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
         FROM articles
         LEFT JOIN comments ON articles.article_id = comments.article_id
         GROUP BY articles.article_id
-        ORDER BY ${finalSort} ${finalOrder.toUpperCase()}`
+        ORDER BY ${sortColumn} ${finalOrder.toUpperCase()}`
     )
 
     .then(({ rows }) => {
@@ -61,7 +66,7 @@ exports.fetchArticles = (sort_by = "created_at", order = "desc") => {
 exports.fetchArticleTopic = (topic) => {
   return db
     .query(
-      `SELECT article_id, title, topic, author, created_at FROM articles WHERE topic = $1`,
+      `SELECT article_id, title, topic, author, created_at, votes, article_img_url FROM articles WHERE topic = $1`,
       [topic]
     )
     .then(({ rows }) => {
