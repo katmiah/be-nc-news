@@ -48,7 +48,7 @@ exports.fetchArticles = (order = "desc") => {
         FROM articles
         LEFT JOIN comments ON articles.article_id = comments.article_id
         GROUP BY articles.article_id
-        ORDER BY articles.created_at ${finalOrder.toUpperCase()}`
+        ORDER BY articles.created_at, articles.votes, comment_count ${finalOrder.toUpperCase()}`
     )
 
     .then(({ rows }) => {
